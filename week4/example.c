@@ -10,7 +10,7 @@ FILE *open_file(char filename[], char mode[]){
     return file;
 
 }
-int main () {
+int main () {   
     FILE* file = open_file("squares.dat","r");
     int buffer_size = 100;
     char buffer [buffer_size];
