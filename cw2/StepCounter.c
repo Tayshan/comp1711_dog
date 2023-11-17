@@ -9,7 +9,7 @@ typedef struct {
 	char date[11];
 	char time[6];
 	int steps;
-} FITNESS_DATA;
+} LIST_DATA;
 
 /*filename -> the name of the file that is being read
 file/file2 -> the contents of the file being read
@@ -41,10 +41,35 @@ FILE* openFile(char filename[]){
     return file;
 }
 
+LIST_DATA * listMaker (int numLines, FILE *file){
+    char date [11];
+    char time [6];
+    char step [6];
+
+    char buffer2[buffer_size];
+
+    LIST_DATA data [numLines];
+    int index = 0;
+
+    while (fgets(buffer2, buffer_size, file)){
+        tokeniseRecord(buffer2, ",", date,time,step);
+        strcpy(data[index].date,date);
+        strcpy(data[index].time,time);
+        data[index].steps = atoi(step);
+        index++;
+    }
+
+    return data;
+}
+
 int main() {
 
     char option;
     char fileName[10];
+    LIST_DATA *dataList;
+    int temp = 0;
+    char tempDate[11] = "";
+    char tempTime[6] = "";
 
     while ( option != 'Q' || option != 'q'){
         printf("Select Menu Option:\nA: Specify the filename to be imported\nB: Display the total number of records in the file\nC: Find the date and time of the timeslot with the fewest steps\nD: Find the data and time of the timeslot with the largest number of steps\nE: Find the mean step count of all the records in the file\nF: Find the longest continuous period where the step count is above 500 steps\nQ: Exit\n");
@@ -66,6 +91,12 @@ int main() {
 
         case 'C':
         case 'c':
+            dataList = listMaker(numRecords(newFile), newFile);
+            for (int i = 0; i < numLines; i++){
+                if (dataList[i].steps < dataList[temp].steps){
+                    temp = i;
+                }
+            }
         break;
 
         case 'D':
@@ -112,7 +143,7 @@ int main() {
 
     char buffer2[buffer_size];
 
-    FITNESS_DATA data [numLines];
+    LIST_DATA data [numLines];
     int index = 0;
 
     while (fgets(buffer2, buffer_size, file2)){
