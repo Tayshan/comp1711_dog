@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "FitnessDataStruct.h"
+#define buffer_size 100
 
 // Define an appropriate struct
 typedef struct {
@@ -23,7 +24,6 @@ data -> a record of all the dates, times and steps
 index -> the index of the value in the data array
  */
 int numRecords(FILE *file){
-    int buffer_size = 100;
     char buffer[buffer_size];
     int numLines = 0;
     while (fgets(buffer, buffer_size, file)){
@@ -35,16 +35,70 @@ int numRecords(FILE *file){
 FILE* openFile(char filename[]){
     FILE *file = fopen(filename, "r") ;
     if (file == NULL){
-        perror("");
-        return 1;
+        perror("File not opened corrrectly");
+        exit;
     }
     return file;
 }
 
 int main() {
 
+    char option;
     char fileName[10];
+
+    while ( option != 'Q' || option != 'q'){
+        printf("Select Menu Option:\nA: Specify the filename to be imported\nB: Display the total number of records in the file\nC: Find the date and time of the timeslot with the fewest steps\nD: Find the data and time of the timeslot with the largest number of steps\nE: Find the mean step count of all the records in the file\nF: Find the longest continuous period where the step count is above 500 steps\nQ: Exit\n");
+        scanf("%c", &option);
+
+        switch (option)
+        {
+        case 'A':
+        case 'a':
+            printf("Enter the filename:\n");
+            scanf("%s", fileName);
+            FILE *newFile = openFile(fileName);
+        break;
+
+        case 'B':
+        case 'b':
+            printf("Total records: %d\n", numRecords(newFile));
+        break;
+
+        case 'C':
+        case 'c':
+        break;
+
+        case 'D':
+        case 'd':
+        break;
+
+        case 'E':
+        break;
+
+        case 'e':
+        break;
+
+        case 'F':
+        case 'f':
+        break;
+
+        case 'G':
+        case 'g':
+        break;
+
+        case 'Q':
+        case 'q':
+            exit;
+
+        default:
+            printf("Invalid choice\n");
+        break;
+        }
+
+    }
+
     FILE *file = openFile(fileName);
+    int numLines = numRecords(file);
 
     char date [11];
     char time [6];
@@ -54,11 +108,7 @@ int main() {
 
     fclose(file);
 
-    FILE *file2 = fopen(filename, "r") ;
-    if (file2 == NULL){
-        perror("");
-        return 1;
-    }
+    FILE *file2 = openFile(fileName);
 
     char buffer2[buffer_size];
 
