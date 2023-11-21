@@ -70,62 +70,56 @@ int main() {
     int temp = 0;
     char tempDate[11] = "";
     char tempTime[6] = "";
+    FILE *newFile;
 
     while ( option != 'Q' || option != 'q'){
-        printf("Select Menu Option:\nA: Specify the filename to be imported\nB: Display the total number of records in the file\nC: Find the date and time of the timeslot with the fewest steps\nD: Find the data and time of the timeslot with the largest number of steps\nE: Find the mean step count of all the records in the file\nF: Find the longest continuous period where the step count is above 500 steps\nQ: Exit\n");
-        scanf("%c", &option);
+        printf("Select Menu Option:\nA: Specify the filename to be imported\nB: Display the total number of records in the file\nC: Find the date and time of the timeslot with the fewest steps\nD: Find the data and time of the timeslot with the largest number of steps\nE: Find the mean step count of all the records in the file\nF: Find the longest continuous period where the step count is above 500 steps\nQ: Exit\n\n");
+        scanf(" %c", &option);
 
-        switch (option)
+        if (option == 'A' || option == 'a')
         {
-        case 'A':
-        case 'a':
             printf("Enter the filename:\n");
             scanf("%s", fileName);
-            FILE *newFile = openFile(fileName);
-        break;
-
-        case 'B':
-        case 'b':
+            newFile = openFile(fileName);
+        }
+        else if (option == 'B' || option == 'b')
+        {
             printf("Total records: %d\n", numRecords(newFile));
-        break;
-
-        case 'C':
-        case 'c':
+        }
+        else if (option == 'C' || option == 'c')
+        {
             dataList = listMaker(numRecords(newFile), newFile);
-            for (int i = 0; i < numLines; i++){
+            for (int i = 0; i < numRecords(newFile); i++){
                 if (dataList[i].steps < dataList[temp].steps){
                     temp = i;
                 }
             }
-        break;
-
-        case 'D':
-        case 'd':
-        break;
-
-        case 'E':
-        break;
-
-        case 'e':
-        break;
-
-        case 'F':
-        case 'f':
-        break;
-
-        case 'G':
-        case 'g':
-        break;
-
-        case 'Q':
-        case 'q':
-            exit;
-
-        default:
-            printf("Invalid choice\n");
-        break;
+            printf("Fewest Steps: %s %s\n",dataList[temp].date,dataList[temp].time);
         }
-
+        else if (option == 'D' || option == 'd')
+        {
+            dataList = listMaker(numRecords(newFile), newFile);
+            for (int i = 0; i < numRecords(newFile); i++){
+                if (dataList[i].steps > dataList[temp].steps){
+                    temp = i;
+                }
+            }
+            printf("Largest Steps: %s %s\n",dataList[temp].date,dataList[temp].time);
+        }
+        else if (option == 'E' || option == 'e')
+        {
+        }
+        else if (option == 'F' || option == 'f')
+        {
+        }
+        else if (option == 'Q' || option == 'q')
+        {
+            exit;
+        }
+        else
+        {
+            printf("Invalid choice\n");
+        }
     }
 
     FILE *file = openFile(fileName);
