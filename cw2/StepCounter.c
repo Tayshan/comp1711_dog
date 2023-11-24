@@ -11,18 +11,7 @@ typedef struct {
 	int steps;
 } LIST_DATA;
 
-/*filename -> the name of the file that is being read
-file/file2 -> the contents of the file being read
-buffer_size -> how much of a line the program should read
-buffer -> the contents of each line in the program
-buffer2 -> the contents of each line that will be read in the program
-numlines -> the number of lines in the program
-date -> value for the date after being read
-time -> exact value of the time after being read
-steps -> the value of the steps after being read and separated from the other values
-data -> a record of all the dates, times and steps
-index -> the index of the value in the data array
- */
+
 int numRecords(FILE *file){
     char buffer[buffer_size];
     int numLines = 0;
@@ -33,7 +22,7 @@ int numRecords(FILE *file){
 }
 
 FILE* openFile(char filename[]){
-    FILE *file = fopen(filename, "r") ;
+    FILE *file = fopen("FitnessData_2023.csv", "r") ;
     if (file == NULL){
         perror("File not opened corrrectly");
         exit;
@@ -41,36 +30,37 @@ FILE* openFile(char filename[]){
     return file;
 }
 
-LIST_DATA * listMaker (int numLines, FILE *file){
+LIST_DATA *listMaker (int numLines, FILE *file, LIST_DATA *data){
+    printf("hello1");
     char date [11];
     char time [6];
     char step [6];
 
-    char buffer2[buffer_size];
+    char buffer[buffer_size];
 
-    LIST_DATA data [numLines];
     int index = 0;
 
-    while (fgets(buffer2, buffer_size, file)){
-        tokeniseRecord(buffer2, ",", date,time,step);
+    while (fgets(buffer, buffer_size, file) != NULL){
+        printf("hello2");
+        tokeniseRecord(buffer, ",", date,time,step);
         strcpy(data[index].date,date);
         strcpy(data[index].time,time);
         data[index].steps = atoi(step);
         index++;
+        printf("%s %s %d /n",data[index].date, data[index].time, data[index].steps);
     }
 
-    return data;
 }
 
 int main() {
 
     char option;
     char fileName[10];
-    LIST_DATA *dataList;
     int temp = 0;
     char tempDate[11] = "";
     char tempTime[6] = "";
     FILE *newFile;
+    FILE *newFile2;
 
     while ( option != 'Q' || option != 'q'){
         printf("Select Menu Option:\nA: Specify the filename to be imported\nB: Display the total number of records in the file\nC: Find the date and time of the timeslot with the fewest steps\nD: Find the data and time of the timeslot with the largest number of steps\nE: Find the mean step count of all the records in the file\nF: Find the longest continuous period where the step count is above 500 steps\nQ: Exit\n\n");
@@ -88,23 +78,22 @@ int main() {
         }
         else if (option == 'C' || option == 'c')
         {
-            dataList = listMaker(numRecords(newFile), newFile);
-            for (int i = 0; i < numRecords(newFile); i++){
+            char buffer[buffer_size];
+            newFile2 = openFile(fileName);
+            int a = numRecords(newFile);
+            LIST_DATA dataList[a];
+            printf("%s",fgets(buffer, buffer_size, newFile));
+            listMaker(a,newFile, dataList);
+            for (int i = 1; i < numRecords(newFile2); i++){
                 if (dataList[i].steps < dataList[temp].steps){
                     temp = i;
                 }
             }
-            printf("Fewest Steps: %s %s\n",dataList[temp].date,dataList[temp].time);
+            fclose(newFile2);
         }
         else if (option == 'D' || option == 'd')
         {
-            dataList = listMaker(numRecords(newFile), newFile);
-            for (int i = 0; i < numRecords(newFile); i++){
-                if (dataList[i].steps > dataList[temp].steps){
-                    temp = i;
-                }
-            }
-            printf("Largest Steps: %s %s\n",dataList[temp].date,dataList[temp].time);
+            //printf("Largest Steps: %s %s\n",dataList[temp].date,dataList[temp].time);//
         }
         else if (option == 'E' || option == 'e')
         {
@@ -121,37 +110,5 @@ int main() {
             printf("Invalid choice\n");
         }
     }
-
-    FILE *file = openFile(fileName);
-    int numLines = numRecords(file);
-
-    char date [11];
-    char time [6];
-    char step [6];
-
-    printf("Number of records in file: %d\n",numLines);
-
-    fclose(file);
-
-    FILE *file2 = openFile(fileName);
-
-    char buffer2[buffer_size];
-
-    LIST_DATA data [numLines];
-    int index = 0;
-
-    while (fgets(buffer2, buffer_size, file2)){
-        tokeniseRecord(buffer2, ",", date,time,step);
-        strcpy(data[index].date,date);
-        strcpy(data[index].time,time);
-        data[index].steps = atoi(step);
-        index++;
-    }
-
-    for (int i = 0; i<3; i++){
-        printf("%s/%s/%d\n",data[i].date,data[i].time,data[i].steps);
-    }
-
-    fclose(file2);
     return 0;
 }
