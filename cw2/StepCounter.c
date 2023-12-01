@@ -22,11 +22,7 @@ int numRecords(FILE *file){
 }
 
 FILE* openFile(char filename[]){
-    FILE *file = fopen("FitnessData_2023.csv", "r") ;
-    if (file == NULL){
-        perror("File not opened corrrectly");
-        return 0;
-    }
+    FILE *file = fopen(filename, "r") ;
     return file;
 }
 
@@ -49,34 +45,34 @@ LIST_DATA *listMaker (int numLines, FILE *file, LIST_DATA *data){
 }
 
 void dateFinder(LIST_DATA *data,int *startDate,int *endDate,int numOfRecs){
-    int streak = 0;
-    char how;
+    int currStreak = 0;
+    int streakOngoing = 0;
     int startStreak, endStreak, temp;
     int streakCheck = 1;
-    int tempStreak = -1;
+    int prevStreak = -1;
     for (int i = 0; i < numOfRecs; i++){
         if (data[i].steps > 500){
             if (streakCheck == 1){
                 startStreak = i;
                 streakCheck = 0;
             }
-            streak++;
-            printf("%d\n",streak);
-            scanf("%c",&how);
+            currStreak++;
+            streakOngoing = 1;
         }
         else{
-            tempStreak = streak;
-            streak = 0;
-            temp = startStreak;
-            endStreak = i;
-            streakCheck = 1;
-            printf("%d\n",tempStreak);
-            scanf("%c",&how);
-        }
-        if (tempStreak > streak){
-            printf("%d %d\n",streak,tempStreak);
-            *startDate = temp;
-            *endDate = endStreak - 1;
+            if (streakOngoing == 1)
+            {          
+                endStreak = i;
+                temp = startStreak;
+                streakCheck = 1;
+                streakOngoing = 0;
+                if (prevStreak < currStreak){
+                    prevStreak = currStreak;
+                    *startDate = temp;
+                    *endDate = endStreak;
+                }
+                currStreak = 0;  
+            }
         }
     }
 
@@ -105,6 +101,10 @@ int main() {
             printf("Enter the filename:\n");
             scanf("%s", fileName);
             newFile = openFile(fileName);
+            if (newFile == NULL){
+                perror("File not opened corrrectly");
+                return 1;
+            }
             totRecs = numRecords(newFile);
         }
         else if (option == 'B' || option == 'b')
@@ -134,7 +134,6 @@ int main() {
                     temp = i;
                 }
             }
-            printf("%s\n",dataList2[temp - 1].date);
             printf("Largest Steps: %s %s\n",dataList2[temp].date,dataList2[temp].time);
             fclose(newFile3);
         }
@@ -167,7 +166,6 @@ int main() {
             LIST_DATA dataList3[totRecs];
             listMaker(totRecs,newFile5, dataList3);
             dateFinder(dataList3,&start,&end,totRecs);
-            printf("%d%d\n",start,end);
             printf("Longest period start: %s %s\n",dataList3[start].date,dataList3[start].time);
             printf("Longest period end: %s %s\n",dataList3[end].date,dataList3[end].time);
             fclose(newFile5);
