@@ -44,9 +44,42 @@ LIST_DATA *listMaker (int numLines, FILE *file, LIST_DATA *data){
         strcpy(data[index].date,date);
         strcpy(data[index].time,time);
         data[index].steps = atoi(step);
-        printf("Largest Steps: %s %s\n",data[index].date,data[index].time);
         index++;
     }
+}
+
+void dateFinder(LIST_DATA *data,int *startDate,int *endDate,int numOfRecs){
+    int streak = 0;
+    char how;
+    int startStreak, endStreak, temp;
+    int streakCheck = 1;
+    int tempStreak = -1;
+    for (int i = 0; i < numOfRecs; i++){
+        if (data[i].steps > 500){
+            if (streakCheck == 1){
+                startStreak = i;
+                streakCheck = 0;
+            }
+            streak++;
+            printf("%d\n",streak);
+            scanf("%c",&how);
+        }
+        else{
+            tempStreak = streak;
+            streak = 0;
+            temp = startStreak;
+            endStreak = i;
+            streakCheck = 1;
+            printf("%d\n",tempStreak);
+            scanf("%c",&how);
+        }
+        if (tempStreak > streak){
+            printf("%d %d\n",streak,tempStreak);
+            *startDate = temp;
+            *endDate = endStreak - 1;
+        }
+    }
+
 }
 
 int main() {
@@ -80,7 +113,6 @@ int main() {
         }
         else if (option == 'C' || option == 'c')
         {
-            char buffer[buffer_size];
             newFile2 = openFile(fileName);
             LIST_DATA dataList[totRecs];
             listMaker(totRecs,newFile2, dataList);
@@ -94,7 +126,6 @@ int main() {
         }
         else if (option == 'D' || option == 'd')
         {
-            char buffer[buffer_size];
             newFile3 = openFile(fileName);
             LIST_DATA dataList2[totRecs];
             listMaker(totRecs,newFile3, dataList2);
@@ -131,7 +162,15 @@ int main() {
         }
         else if (option == 'F' || option == 'f')
         {
-            
+            int start,end;
+            newFile5 = openFile(fileName);
+            LIST_DATA dataList3[totRecs];
+            listMaker(totRecs,newFile5, dataList3);
+            dateFinder(dataList3,&start,&end,totRecs);
+            printf("%d%d\n",start,end);
+            printf("Longest period start: %s %s\n",dataList3[start].date,dataList3[start].time);
+            printf("Longest period end: %s %s\n",dataList3[end].date,dataList3[end].time);
+            fclose(newFile5);
         }
         else if (option == 'Q' || option == 'q')
         {
