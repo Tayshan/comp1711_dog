@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "FitnessDataStruct.h"
 #define buffer_size 100
 
 typedef struct {
@@ -10,8 +11,7 @@ typedef struct {
 } LIST_DATA;
 
 FILE* readFile(char filename[]){
-
-    FILE *file = fopen(filename, "r") ;
+    FILE *file = fopen(filename, "r");
     return file;
 }
 
@@ -20,24 +20,21 @@ FILE* writeFile(char filename[]){
     return file;
 }
 
-void tokeniseRecord(const char *input, const char *delimiter,char *date, char *time, char *steps) {
-    char *inputCopy = strdup(input);
-    char *token = strtok(inputCopy, delimiter);
-    if (token != NULL) {        strcpy(date, token);
-    }
-    token = strtok(NULL, delimiter);
-    if (token != NULL) {
-        strcpy(time, token);
-    }
-    token = strtok(NULL, delimiter);
-    if (token != NULL) {
-        strcpy(steps, token);
-    }
-    free(inputCopy);
-}
 
-int formatCheck(LIST_DATA * data){
-    return 1;
+int formatCheck(LIST_DATA *data, int numLines){
+    int passCheck = 1;
+    for (int i = 0; i < numLines; i++){
+        if(strchr(data[i].date,'-') == NULL ||strchr(data[i].time,'-') != NULL ){
+            passCheck = 0;
+        }
+        if(strchr(data[i].time,':') == NULL ||strchr(data[i].date,':') != NULL ){
+            passCheck = 0;
+        }
+        if(data[i].steps == 0){
+            passCheck = 0;
+        }
+    }
+    return passCheck;
 } 
 
 
@@ -78,7 +75,7 @@ void sortList(LIST_DATA *data, int numRecs){
     {
         sorted = 1;
         for (int i = 1; i < numRecs; i++){
-            if( data[i - 1].steps > data[i].steps)
+            if( data[i - 1].steps < data[i].steps)
             {
                 tempSteps = data[i - 1].steps;
                 strcpy(tempDate,data[i - 1].date);
@@ -99,8 +96,10 @@ void sortList(LIST_DATA *data, int numRecs){
 
 }
 
-void writeToFile(LIST_DATA *data){
-    
+void writeToFile(LIST_DATA *data, int numRecs, FILE *newFile){
+    for (int index = 0; index < numRecs; index++){
+            fprintf(newFile,"%s\t%s\t%d\n",data[index].date,data[index].time,data[index].steps);
+    }
 }
 
 int main() {
@@ -108,21 +107,28 @@ int main() {
     printf("Enter Filename:\n");
     scanf("%s",fileName);
 
+    FILE *countFile = readFile(fileName);
+    if (countFile == NULL){
+        perror("Error: invalid file");
+        return 1;
+    }
+    int numOfRecs = numRecords(countFile);
+    fclose(countFile);
     FILE *dataFile = readFile(fileName);
-    int numOfRecs = numRecords(dataFile);
     LIST_DATA dataList[numOfRecs];
+
+    listMaker(dataFile, dataList);
     fclose(dataFile);
 
-    if (dataFile == NULL){
-        perror("File not opened corrrectly");
+    if (formatCheck(dataList, numOfRecs) == 0){
+        perror("Error: invalid file");
         return 1;
     }
 
-    listMaker(dataFile, dataList);
-    sortList( dataList, numOfRecs);
-
+    sortList(dataList, numOfRecs);
     FILE *sortedFile = writeFile(fileName);
-
+    writeToFile(dataList,numOfRecs,sortedFile);
+    fclose(sortedFile);
 
 
     return 0;

@@ -124,60 +124,6 @@ int main() {
             printf("Fewest steps: %s %s\n",dataList[temp].date,dataList[temp].time);
             fclose(newFile2);
         }
-        else if (option == 'D' || option == 'd')
-        {
-            newFile3 = openFile(fileName);
-            LIST_DATA dataList2[totRecs];
-            listMaker(totRecs,newFile3, dataList2);
-            for (int i = 1; i < totRecs; i++){
-                if (dataList2[i].steps > dataList2[temp].steps){
-                    temp = i;
-                }
-            }
-            printf("Largest steps: %s %s\n",dataList2[temp].date,dataList2[temp].time);
-            fclose(newFile3);
-        }
-        else if (option == 'E' || option == 'e')
-        {
-            char date [11];
-            char time [6];
-            char step [6];
-            int meanRounded;
-            float mean;
-            newFile4 = openFile(fileName);
-            float totSteps;
-            char buffer[buffer_size];
-
-            int index = 0;
-
-            while (fgets(buffer, buffer_size, newFile4) != NULL){
-                tokeniseRecord(buffer, ",", date,time,step);
-                totSteps += atoi(step);
-            }
-            mean = totSteps/totRecs + 0.5;
-            meanRounded = (int)(mean);
-            printf("Mean step count: %d\n",meanRounded);
-            fclose(newFile4);
-        }
-        else if (option == 'F' || option == 'f')
-        {
-            int start,end;
-            newFile5 = openFile(fileName);
-            LIST_DATA dataList3[totRecs];
-            listMaker(totRecs,newFile5, dataList3);
-            dateFinder(dataList3,&start,&end,totRecs);
-            printf("Longest period start: %s %s\n",dataList3[start].date,dataList3[start].time);
-            printf("Longest period end: %s %s\n",dataList3[end - 1].date,dataList3[end - 1].time);
-            fclose(newFile5);
-        }
-        else if (option == 'Q' || option == 'q')
-        {
-            return 0;
-        }
-        else
-        {
-            printf("Invalid choice\n");
-        }
     }
     return 0;
 }
